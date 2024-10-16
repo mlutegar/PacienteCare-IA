@@ -5,3 +5,5 @@ chromadb~=0.5.13
 langchain-community
 langchain-openai
 langchain-chroma
+
+uvicorn~=0.32.0
