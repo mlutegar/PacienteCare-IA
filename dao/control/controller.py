@@ -1,4 +1,4 @@
-from langchain import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 from dao.model.models import db
 
 def root_controller():

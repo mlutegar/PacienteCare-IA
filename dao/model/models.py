@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from langchain.embeddings import OpenAIEmbeddings
 from chromadb.config import DEFAULT_TENANT, DEFAULT_DATABASE, Settings
 from langchain_openai import OpenAIEmbeddings
 from langchain_chroma import Chroma
