@@ -51,6 +51,9 @@ jobs:
       - name: Unzip artifact for deployment
         run: unzip release.zip
 
+      - name: Create ChromaDB directory
+        run: mkdir -p /home/runner/work/chroma_data
+
       - name: Start the FastAPI application
         run: |
           pip install -r requirements.txt
