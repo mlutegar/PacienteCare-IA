@@ -6,8 +6,19 @@ WORKDIR /app
 
 # Instalar SQLite 3.35.0 ou superior e outras dependências necessárias
 RUN apt-get update && apt-get install -y \
-    sqlite3 \
+    wget \
+    build-essential \
+    libsqlite3-dev \
+    && wget https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz \
+    && tar xvfz sqlite-autoconf-3350500.tar.gz \
+    && cd sqlite-autoconf-3350500 \
+    && ./configure --prefix=/usr/local \
+    && make \
+    && make install \
     && rm -rf /var/lib/apt/lists/*
+
+# Adicionar o SQLite à variável de ambiente para que a nova versão seja usada
+ENV LD_LIBRARY_PATH="/usr/local/lib"
 
 # Copiar os arquivos do projeto para o contêiner
 COPY . .
