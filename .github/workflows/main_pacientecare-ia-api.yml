@@ -46,3 +46,7 @@ jobs:
           slot-name: 'production'
           publish-profile: ${{ secrets.AzureAppService_PublishProfile_367fcd54c5824850bce79bcdfbda7be3 }}
           images: 'pacientecareregistry.azurecr.io/pacientecare-ia-api:${{ github.sha }}'
+
+      # Adicionando a OpenAI API Key como variável de ambiente no container
+      - name: Set OpenAI API Key
+        run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
