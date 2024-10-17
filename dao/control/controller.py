@@ -1,4 +1,7 @@
+from langchain.chains.question_answering import load_qa_chain
 from langchain_core.prompts import PromptTemplate
+from langchain_openai import OpenAI
+
 from dao.model.models import db
 
 def root_controller():
@@ -43,11 +46,9 @@ def predict_controller(data):
     )
 
     # Precisa da API
-    # docs = db.similarity_search(query, k=1)
-    # print(docs)
-    # chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
-    # response = chain.run(input_documents=docs, question=query)
-
-    response = "Baseado nos registros médicos, o procedimento de Harmonização Facial com Nabota pode ser realizado, mas é necessário precaução devido à condição de gravidez mencionada."
+    docs = db.similarity_search(query, k=1)
+    print(docs)
+    chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
+    response = chain.run(input_documents=docs, question=query)
 
     return {"response": response}
