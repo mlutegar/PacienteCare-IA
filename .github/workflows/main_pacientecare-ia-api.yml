@@ -11,34 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Checkout do código
       - name: Checkout the repository
         uses: actions/checkout@v4
 
-      - name: Log in to Azure Container Registry (ACR)
+      # Login no Azure usando as credenciais fornecidas
+      - name: Log in to Azure
         uses: azure/login@v2
         with:
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
+      # Login no Azure Container Registry (ACR)
+      - name: Log in to Azure Container Registry (ACR)
+        run: |
+          az acr login --name ${{ secrets.AZURE_ACR_LOGIN_SERVER }}
+
+      # Build e Push da imagem Docker para o ACR
       - name: Build and push Docker image to ACR
         run: |
-          # Variáveis
-          ACR_LOGIN_SERVER=${{ secrets.AZURE_ACR_LOGIN_SERVER }}
           IMAGE_NAME=pacientecare-ia-api
           IMAGE_TAG=latest
+          ACR_LOGIN_SERVER=${{ secrets.AZURE_ACR_LOGIN_SERVER }}
 
-          # Logar no ACR
-          az acr login --name $ACR_LOGIN_SERVER
-
-          # Build da imagem Docker e push para o ACR
+          # Build da imagem Docker
           docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG .
+
+          # Push para o ACR
           docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
 
+      # Deploy do container para a Azure Web App
       - name: Deploy Docker image to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'pacientecare-ia-api'
           images: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/pacientecare-ia-api:latest
           slot-name: 'Production'
-
