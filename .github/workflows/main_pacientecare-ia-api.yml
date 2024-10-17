@@ -40,6 +40,9 @@ jobs:
     needs: build
     environment:
       name: 'Production'
+    permissions:
+      id-token: write  # Adicionado para permitir a geração do token
+      contents: read
 
     steps:
       # Login na Azure (necessário para o deploy na Web App)
