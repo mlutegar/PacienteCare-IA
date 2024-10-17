@@ -4,21 +4,18 @@ FROM python:3.12-slim
 # Definir o diretório de trabalho dentro do contêiner
 WORKDIR /app
 
-# Instalar SQLite 3.35.0 ou superior e outras dependências necessárias
+# Atualizar e instalar uma versão recente do SQLite 3.35.0 ou superior
 RUN apt-get update && apt-get install -y \
+    sqlite3 \
     wget \
-    build-essential \
-    libsqlite3-dev \
-    && wget https://sqlite.org/2021/sqlite-autoconf-3350500.tar.gz \
-    && tar xvfz sqlite-autoconf-3350500.tar.gz \
-    && cd sqlite-autoconf-3350500 \
-    && ./configure --prefix=/usr/local \
-    && make \
-    && make install \
+    && wget https://www.sqlite.org/2023/sqlite-autoconf-3410200.tar.gz \
+    && tar xvfz sqlite-autoconf-3410200.tar.gz \
+    && cd sqlite-autoconf-3410200 \
+    && ./configure && make && make install \
     && rm -rf /var/lib/apt/lists/*
 
-# Adicionar o SQLite à variável de ambiente para que a nova versão seja usada
-ENV LD_LIBRARY_PATH="/usr/local/lib"
+# Verificar a versão do SQLite para garantir que seja a correta
+RUN sqlite3 --version
 
 # Copiar os arquivos do projeto para o contêiner
 COPY . .
