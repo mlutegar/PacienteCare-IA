@@ -1,4 +1,4 @@
-name: Build and deploy Python app to Azure Web App - pacientecare-ia-api
+name: Build and deploy Python app to Azure Web App - pacientecare-ia-api (Docker)
 
 on:
   push:
@@ -7,68 +7,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout the repository
+        uses: actions/checkout@v4
 
-      - name: Set up Python version
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-        
-      # Optional: Add step to run tests here (PyTest, Django test suites, etc.)
-
-      - name: Zip artifact for deployment
-        run: zip release.zip ./* -r
-
-      - name: Upload artifact for deployment jobs
-        uses: actions/upload-artifact@v4
-        with:
-          name: python-app
-          path: |
-            release.zip
-
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-    environment:
-      name: 'Production'
-      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
-    permissions:
-      id-token: write # This is required for requesting the JWT
-
-    steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: python-app
-
-      - name: Unzip artifact for deployment
-        run: unzip release.zip
-
-      - name: Create ChromaDB directory
-        run: mkdir -p /home/runner/work/chroma_data
-
-      - name: Start the FastAPI application
-        run: |
-          pip install -r requirements.txt
-          nohup uvicorn main:app --host 0.0.0.0 --port 8000 &
-      
-      - name: Login to Azure
+      - name: Log in to Azure Container Registry (ACR)
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FEA645874D1E4FD58EBB52998BA5AA88 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9AF0A896C35144B6AA1744C27958BE6E }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6314B98974B24343B128998E82E40AAB }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Build and push Docker image to ACR
+        run: |
+          # Variáveis
+          ACR_LOGIN_SERVER=${{ secrets.AZURE_ACR_LOGIN_SERVER }}
+          IMAGE_NAME=pacientecare-ia-api
+          IMAGE_TAG=latest
+
+          # Logar no ACR
+          az acr login --name $ACR_LOGIN_SERVER
+
+          # Build da imagem Docker e push para o ACR
+          docker build -t $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG .
+          docker push $ACR_LOGIN_SERVER/$IMAGE_NAME:$IMAGE_TAG
+
+      - name: Deploy Docker image to Azure Web App
         uses: azure/webapps-deploy@v3
-        id: deploy-to-webapp
         with:
           app-name: 'pacientecare-ia-api'
+          images: ${{ secrets.AZURE_ACR_LOGIN_SERVER }}/pacientecare-ia-api:latest
           slot-name: 'Production'
+

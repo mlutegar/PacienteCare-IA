@@ -7,3 +7,4 @@ langchain-openai
 langchain-chroma
 
 uvicorn[standard]
+gunicorn
