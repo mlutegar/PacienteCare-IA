@@ -1,11 +1,16 @@
 from langchain_core.prompts import PromptTemplate
+from langchain.chains import load_qa_chain
+from langchain.llms import OpenAI
 from dao.model.models import db
+
 
 def root_controller():
     return {"message": "Hello World"}
 
+
 def say_hello_controller(name: str):
     return {"message": f"Hello {name}"}
+
 
 def predict_controller(data):
     template = """
@@ -30,7 +35,7 @@ def predict_controller(data):
     """
     prompt_template = PromptTemplate(
         input_variables=["idade", "alergias", "procedimentos_anteriores", "medicamentos", "condicoes_saude",
-                         "procedimento"], template=template)
+                         "procedimento", "toxina"], template=template)
 
     query = prompt_template.format(
         idade=data.idade,
@@ -42,12 +47,11 @@ def predict_controller(data):
         toxina=data.toxina
     )
 
-    # Precisa da API
-    # docs = db.similarity_search(query, k=1)
-    # print(docs)
-    # chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
-    # response = chain.run(input_documents=docs, question=query)
+    # Realizar a busca de documentos semelhantes
+    docs = db.similarity_search(query, k=1)
 
-    response = "Baseado nos registros médicos, o procedimento de Harmonização Facial com Nabota pode ser realizado, mas é necessário precaução devido à condição de gravidez mencionada."
+    # Carregar o modelo de IA da OpenAI e gerar a resposta
+    chain = load_qa_chain(OpenAI(temperature=0), chain_type="stuff")
+    response = chain.run(input_documents=docs, question=query)
 
     return {"response": response}

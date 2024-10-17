@@ -44,5 +44,5 @@ jobs:
         with:
           app-name: 'pacientecare-ia-api'
           slot-name: 'production'
-          publish-profile: ${{ secrets.AzureAppService_PublishProfile_367fcd54c5824850bce79bcdfbda7be3 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
           images: 'pacientecareregistry.azurecr.io/pacientecare-ia-api:${{ github.sha }}'
