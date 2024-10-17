@@ -8,3 +8,4 @@ langchain-chroma
 
 uvicorn[standard]
 gunicorn
+azure-storage-blob

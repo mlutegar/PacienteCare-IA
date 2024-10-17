@@ -50,3 +50,7 @@ jobs:
       # Adicionando a OpenAI API Key como variável de ambiente no container
       - name: Set OpenAI API Key
         run: echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> $GITHUB_ENV
+
+      # Adicionando a Azure Blob Storage Connection String como variável de ambiente no container
+      - name: Set Azure Blob Storage Connection String
+        run: echo "AZURE_STORAGE_CONNECTION_STRING=${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" >> $GITHUB_ENV
