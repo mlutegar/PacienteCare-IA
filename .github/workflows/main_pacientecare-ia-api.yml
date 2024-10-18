@@ -22,6 +22,9 @@ jobs:
           registry: https://pacientecareregistry.azurecr.io/
           username: ${{ secrets.ACR_USERNAME }}
           password: ${{ secrets.ACR_PASSWORD }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_FEA645874D1E4FD58EBB52998BA5AA88 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_9AF0A896C35144B6AA1744C27958BE6E }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
 
       - name: Build and push Docker image to ACR
         uses: docker/build-push-action@v3
@@ -45,4 +48,4 @@ jobs:
           app-name: 'pacientecare-ia-api'
           slot-name: 'production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }}
-          images: 'pacientecareregistry.azurecr.io/pacientecare-ia-api:${{ github.sha }}'
+          images: 'pacientecareregistry.azurecr.io/${{ secrets.ACR_USERNAME }}/pacientecare-ia-api:${{ github.sha }}'
